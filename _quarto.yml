@@ -1,0 +1,17 @@
+project:
+  type: website
+
+website:
+  description: "A blog built with Quarto"
+  site-url: https://assuncaolfi.github.io
+  title: "blog"
+  navbar:
+    right:
+      - icon: github
+        href: https://github.com/
+      - icon: bluesky
+        href: https://bsky.app/
+format:
+  html:
+    theme: none
+    css: styles.css

@@ -1,0 +1,25 @@
+---
+title: "Luís Assunção"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com
+    - icon: github
+      text: Github
+      href: https://github.com
+listing:
+  id: post-listing
+  contents:
+    - posts
+  feed: true
+  sort: "date desc"
+  type: custom
+  template: listing.ejs
+  fields: [date, title]
+  sort-ui: false
+  filter-ui: false
+  categories: false
+---
