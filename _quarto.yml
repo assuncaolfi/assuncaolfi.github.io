@@ -1,6 +1,9 @@
 project:
   type: website
 
+execute:
+  execute-dir: file
+
 website:
   description: "A blog built with Quarto"
   site-url: https://assuncaolfi.github.io
