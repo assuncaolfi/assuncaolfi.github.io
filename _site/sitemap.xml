@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://your-website-url.example.com/about.html</loc>
-    <lastmod>2026-07-01T14:06:33.978Z</lastmod>
+    <loc>https://assuncaolfi.github.io/about.html</loc>
+    <lastmod>2026-07-01T19:43:13.441Z</lastmod>
   </url>
   <url>
-    <loc>https://your-website-url.example.com/posts/visual-index-common-brazilian-woods/index.html</loc>
-    <lastmod>2026-07-01T19:08:42.461Z</lastmod>
-  </url>
-  <url>
-    <loc>https://your-website-url.example.com/index.html</loc>
-    <lastmod>2026-07-01T19:32:07.708Z</lastmod>
+    <loc>https://assuncaolfi.github.io/posts/visual-index-common-brazilian-woods/index.html</loc>
+    <lastmod>2026-07-01T19:43:13.443Z</lastmod>
   </url>
   <url>
     <loc>https://assuncaolfi.github.io/index.html</loc>
-    <lastmod>2026-07-01T19:32:07.708Z</lastmod>
+    <lastmod>2026-07-01T19:43:13.442Z</lastmod>
   </url>
 </urlset>
