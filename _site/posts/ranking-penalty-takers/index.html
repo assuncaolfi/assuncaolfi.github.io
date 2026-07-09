@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-07-09">
+
+<title>Ranking penalty takers – blog</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+
+<a href="../../">← Home</a>
+
+<header id="title-block-header">
+<h1 class="title">Ranking penalty takers</h1>
+
+<p class="date">July 9, 2026</p>
+</header>
+
+
+<p>Since Brazil was eliminated from the World Cup on Sunday, there’s been some discussion on why Ancelotti picked Bruno Guimarães to shoot that first penalty. <a href="https://sports.yahoo.com/articles/vini-not-even-top-five-232700287.html">Supposedly, it was due to Bruno’s historical conversion rate</a>. Let’s investigate this claim.</p>
+<p>We begin by plotting penalty data for all current Brazil national team players in recent years prior to the Brazil vs Norway match (hover over each penalty to see match details):</p>
+<div id="cell-2" class="cell" data-execution_count="24">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    pl.read_csv(<span class="st">"data.csv"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">filter</span>(pl.col(<span class="st">"date"</span>).is_between(pl.date(<span class="dv">2023</span>, <span class="dv">1</span>, <span class="dv">1</span>), pl.date(<span class="dv">2026</span>, <span class="dv">7</span>, <span class="dv">4</span>)))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">"scored"</span>).cast(pl.Boolean),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">"scored"</span>).<span class="bu">sum</span>().over(<span class="st">"player"</span>).alias(<span class="st">"player_goals"</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">"scored"</span>).count().over(<span class="st">"player"</span>).alias(<span class="st">"player_shots"</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        pl.row_index().over(<span class="st">"player"</span>, order_by<span class="op">=</span>[<span class="st">"date"</span>]).alias(<span class="st">"shot"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        pl.when(pl.col(<span class="st">"scored"</span>))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        .then(pl.lit(<span class="st">"Scored"</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        .otherwise(pl.lit(<span class="st">"Missed"</span>))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        .alias(<span class="st">"result"</span>),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        pl.<span class="bu">format</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"</span><span class="sc">{}</span><span class="st"> (</span><span class="sc">{}</span><span class="st">/</span><span class="sc">{}</span><span class="st">)"</span>, <span class="st">"player"</span>, pl.col(<span class="st">"player_goals"</span>), pl.col(<span class="st">"player_shots"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">"label"</span>),</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>order <span class="op">=</span> df.sort([<span class="st">"player_goals"</span>, <span class="st">"player_shots"</span>], descending<span class="op">=</span><span class="va">True</span>)[<span class="st">"label"</span>].to_list()</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    alt.Chart(df)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    .mark_point(filled<span class="op">=</span><span class="va">True</span>, size<span class="op">=</span><span class="dv">120</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    .encode(</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span>alt.X(<span class="st">"shot:O"</span>, title<span class="op">=</span><span class="st">"Shot"</span>, axis<span class="op">=</span><span class="va">None</span>),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        y<span class="op">=</span>alt.Y(<span class="st">"label:N"</span>, sort<span class="op">=</span>order, title<span class="op">=</span><span class="va">None</span>),</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>alt.Color(</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>            <span class="st">"result:N"</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span><span class="st">"Result"</span>,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>[<span class="st">"#e0e0e0"</span>, <span class="st">"steelblue"</span>]),</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        tooltip<span class="op">=</span>[</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"player:N"</span>, title<span class="op">=</span><span class="st">"Player"</span>),</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"date:N"</span>, title<span class="op">=</span><span class="st">"Date"</span>),</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"competition:N"</span>, title<span class="op">=</span><span class="st">"Competition"</span>),</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"club:N"</span>, title<span class="op">=</span><span class="st">"Team"</span>),</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"opponent:N"</span>, title<span class="op">=</span><span class="st">"Opponent"</span>),</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"result:N"</span>, title<span class="op">=</span><span class="st">"Result"</span>),</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"goalkeeper:N"</span>, title<span class="op">=</span><span class="st">"Goalkeeper"</span>),</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>            alt.Tooltip(<span class="st">"scored:N"</span>, title<span class="op">=</span><span class="st">"Scored"</span>),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    .properties(</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        title<span class="op">=</span>alt.TitleParams(</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>            text<span class="op">=</span><span class="st">"Penalty shots by Brazilian NT players"</span>,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>            subtitle<span class="op">=</span>[</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Each dot is one penalty shot between Jan 1st, 2023 and July 4th, 2026."</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        width<span class="op">=</span><span class="st">"container"</span>,</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        height<span class="op">=</span><span class="dv">600</span>,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="24">
+
+<style>
+  #altair-viz-0f9acad66f6149faaf92033835ef485a.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-0f9acad66f6149faaf92033835ef485a.vega-embed details,
+  #altair-viz-0f9acad66f6149faaf92033835ef485a.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-0f9acad66f6149faaf92033835ef485a"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-0f9acad66f6149faaf92033835ef485a") {
+      outputDiv = document.getElementById("altair-viz-0f9acad66f6149faaf92033835ef485a");
+    }
+
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@6?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@6.4.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@7?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      let deps = ["vega-embed"];
+      require(deps, displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "6")
+        .then(() => maybeLoadScript("vega-lite", "6.4.1"))
+        .then(() => maybeLoadScript("vega-embed", "7"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-6ad38108a506a5e63df3da2e819aaa23"}, "mark": {"type": "point", "filled": true, "size": 120}, "encoding": {"color": {"field": "result", "scale": {"range": ["#e0e0e0", "steelblue"]}, "title": "Result", "type": "nominal"}, "tooltip": [{"field": "player", "title": "Player", "type": "nominal"}, {"field": "date", "title": "Date", "type": "nominal"}, {"field": "competition", "title": "Competition", "type": "nominal"}, {"field": "club", "title": "Team", "type": "nominal"}, {"field": "opponent", "title": "Opponent", "type": "nominal"}, {"field": "result", "title": "Result", "type": "nominal"}, {"field": "goalkeeper", "title": "Goalkeeper", "type": "nominal"}, {"field": "scored", "title": "Scored", "type": "nominal"}], "x": {"axis": null, "field": "shot", "title": "Shot", "type": "ordinal"}, "y": {"field": "label", "sort": ["Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Igor Thiago (19/25)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Vinicius Junior (13/18)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Lucas Paquet\u00e1 (11/13)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Raphinha (11/11)", "Neymar (4/6)", "Neymar (4/6)", "Neymar (4/6)", "Neymar (4/6)", "Neymar (4/6)", "Neymar (4/6)", "Rayan (4/4)", "Rayan (4/4)", "Rayan (4/4)", "Rayan (4/4)", "Fabinho (3/7)", "Fabinho (3/7)", "Fabinho (3/7)", "Fabinho (3/7)", "Fabinho (3/7)", "Fabinho (3/7)", "Fabinho (3/7)", "Matheus Cunha (2/2)", "Matheus Cunha (2/2)", "Bruno Guimar\u00e3es (2/2)", "Bruno Guimar\u00e3es (2/2)", "Endrick (1/3)", "Endrick (1/3)", "Endrick (1/3)", "Luiz Henrique (1/2)", "Luiz Henrique (1/2)", "\u00c9derson (1/1)"], "title": null, "type": "nominal"}}, "height": 600, "title": {"text": "Penalty shots by Brazilian NT players", "subtitle": ["Each dot is one penalty shot between Jan 1st, 2023 and July 4th, 2026."]}, "width": "container", "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-6ad38108a506a5e63df3da2e819aaa23": [{"season": "25/26", "competition": "AFC Champions League Elite", "club": "Al-Ittihad Club", "date": "2026-04-14", "result": "Scored", "opponent": "Al-Wahda FC", "goalkeeper": "Zayed Ahmed", "player": "Fabinho", "scored": true, "player_goals": 3, "player_shots": 7, "shot": 6, "label": "Fabinho (3/7)"}, {"season": "25/26", "competition": "Saudi Pro League", "club": "Al-Ittihad Club", "date": "2026-03-06", "result": "Scored", "opponent": "Al-Ahli SFC", "goalkeeper": "Edouard Mendy", "player": "Fabinho", "scored": true, "player_goals": 3, "player_shots": 7, "shot": 5, "label": "Fabinho (3/7)"}, {"season": "24/25", "competition": "King's Cup", "club": "Al-Ittihad Club", "date": "2025-04-01", "result": "Scored", "opponent": "Al-Shabab FC", "goalkeeper": "Georgiy Bushchan", "player": "Fabinho", "scored": true, "player_goals": 3, "player_shots": 7, "shot": 2, "label": "Fabinho (3/7)"}, {"season": "24/25", "competition": "Saudi Pro League", "club": "Al-Ittihad Club", "date": "2025-04-17", "result": "Missed", "opponent": "Al-Fateh SC", "goalkeeper": "Nawaf Al-Aqidi", "player": "Fabinho", "scored": false, "player_goals": 3, "player_shots": 7, "shot": 3, "label": "Fabinho (3/7)"}, {"season": "23/24", "competition": "Saudi Pro League", "club": "Al-Ittihad Club", "date": "2024-05-27", "result": "Missed", "opponent": "Al-Nassr FC", "goalkeeper": "Raghed Al-Najjar", "player": "Fabinho", "scored": false, "player_goals": 3, "player_shots": 7, "shot": 0, "label": "Fabinho (3/7)"}, {"season": "24/25", "competition": "Saudi Pro League", "club": "Al-Ittihad Club", "date": "2025-04-17", "result": "Missed", "opponent": "Al-Fateh SC", "goalkeeper": "Nawaf Al-Aqidi", "player": "Fabinho", "scored": false, "player_goals": 3, "player_shots": 7, "shot": 4, "label": "Fabinho (3/7)"}, {"season": "23/24", "competition": "Saudi Pro League", "club": "Al-Ittihad Club", "date": "2024-05-27", "result": "Missed", "opponent": "Al-Nassr FC", "goalkeeper": "Raghed Al-Najjar", "player": "Fabinho", "scored": false, "player_goals": 3, "player_shots": 7, "shot": 1, "label": "Fabinho (3/7)"}, {"season": "25/26", "competition": "Premier League", "club": "Newcastle United", "date": "2026-02-07", "result": "Scored", "opponent": "Brentford FC", "goalkeeper": "Caoimh\u00edn Kelleher", "player": "Bruno Guimar\u00e3es", "scored": true, "player_goals": 2, "player_shots": 2, "shot": 1, "label": "Bruno Guimar\u00e3es (2/2)"}, {"season": "25/26", "competition": "Premier League", "club": "Newcastle United", "date": "2026-01-07", "result": "Scored", "opponent": "Leeds United", "goalkeeper": "Lucas Perri", "player": "Bruno Guimar\u00e3es", "scored": true, "player_goals": 2, "player_shots": 2, "shot": 0, "label": "Bruno Guimar\u00e3es (2/2)"}, {"season": "25/26", "competition": "Serie A", "club": "Atalanta BC", "date": "2026-02-14", "result": "Scored", "opponent": "SS Lazio", "goalkeeper": "Ivan Provedel", "player": "\u00c9derson", "scored": true, "player_goals": 1, "player_shots": 1, "shot": 0, "label": "\u00c9derson (1/1)"}, {"season": "25/26", "competition": "Copa Libertadores", "club": "CR Flamengo", "date": "2026-05-27", "result": "Scored", "opponent": "Cusco FC", "goalkeeper": "Andy Vidal", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 12, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "25/26", "competition": "Premier League", "club": "West Ham United", "date": "2025-12-30", "result": "Scored", "opponent": "Brighton & Hove Albion", "goalkeeper": "Bart Verbruggen", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 11, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "25/26", "competition": "Premier League", "club": "West Ham United", "date": "2025-08-31", "result": "Scored", "opponent": "Nottingham Forest", "goalkeeper": "Matz Sels", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 9, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "24/25", "competition": "Premier League", "club": "West Ham United", "date": "2024-12-16", "result": "Scored", "opponent": "AFC Bournemouth", "goalkeeper": "Kepa Arrizabalaga", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 8, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "24/25", "competition": "Premier League", "club": "West Ham United", "date": "2024-08-17", "result": "Scored", "opponent": "Aston Villa", "goalkeeper": "Emiliano Mart\u00ednez", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 7, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "23/24", "competition": "Copa Am\u00e9rica", "club": "Brazil", "date": "2024-06-29", "result": "Scored", "opponent": "Paraguay", "goalkeeper": "Rodrigo Mor\u00ednigo", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 5, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "23/24", "competition": "Premier League", "club": "West Ham United", "date": "2024-04-06", "result": "Scored", "opponent": "Wolverhampton Wanderers", "goalkeeper": "Jos\u00e9 S\u00e1", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 4, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "23/24", "competition": "International Friendlies", "club": "Brazil", "date": "2024-03-26", "result": "Scored", "opponent": "Spain", "goalkeeper": "Unai Sim\u00f3n", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 3, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "23/24", "competition": "Premier League", "club": "West Ham United", "date": "2023-08-20", "result": "Scored", "opponent": "Chelsea FC", "goalkeeper": "Robert S\u00e1nchez", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 2, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "22/23", "competition": "UEFA Conference League", "club": "West Ham United", "date": "2023-04-20", "result": "Scored", "opponent": "KAA Gent", "goalkeeper": "Davy Roef", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 1, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "22/23", "competition": "Premier League", "club": "West Ham United", "date": "2023-01-04", "result": "Scored", "opponent": "Leeds United", "goalkeeper": "Illan Meslier", "player": "Lucas Paquet\u00e1", "scored": true, "player_goals": 11, "player_shots": 13, "shot": 0, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "25/26", "competition": "International Friendlies", "club": "Brazil", "date": "2025-11-18", "result": "Missed", "opponent": "Tunisia", "goalkeeper": "Aymen Dahmen", "player": "Lucas Paquet\u00e1", "scored": false, "player_goals": 11, "player_shots": 13, "shot": 10, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "23/24", "competition": "Copa Am\u00e9rica", "club": "Brazil", "date": "2024-06-29", "result": "Missed", "opponent": "Paraguay", "goalkeeper": "Rodrigo Mor\u00ednigo", "player": "Lucas Paquet\u00e1", "scored": false, "player_goals": 11, "player_shots": 13, "shot": 6, "label": "Lucas Paquet\u00e1 (11/13)"}, {"season": "25/26", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Santos FC", "date": "2026-03-19", "result": "Scored", "opponent": "Sport Club Internacional", "goalkeeper": "Sergio Rochet", "player": "Neymar", "scored": true, "player_goals": 4, "player_shots": 6, "shot": 5, "label": "Neymar (4/6)"}, {"season": "24/25", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Santos FC", "date": "2025-12-03", "result": "Scored", "opponent": "Esporte Clube Juventude", "goalkeeper": "Jandrei", "player": "Neymar", "scored": true, "player_goals": 4, "player_shots": 6, "shot": 4, "label": "Neymar (4/6)"}, {"season": "24/25", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Santos FC", "date": "2025-08-05", "result": "Scored", "opponent": "Esporte Clube Juventude", "goalkeeper": "Ruan Carneiro", "player": "Neymar", "scored": true, "player_goals": 4, "player_shots": 6, "shot": 3, "label": "Neymar (4/6)"}, {"season": "24/25", "competition": "Campeonato Paulista", "club": "Santos FC", "date": "2025-02-17", "result": "Scored", "opponent": "EC \u00c1gua Santa (SP)", "goalkeeper": "Luan Ribeiro", "player": "Neymar", "scored": true, "player_goals": 4, "player_shots": 6, "shot": 2, "label": "Neymar (4/6)"}, {"season": "23/24", "competition": "Saudi Pro League", "club": "Al-Hilal SFC", "date": "2023-09-29", "result": "Missed", "opponent": "Al-Shabab FC", "goalkeeper": "Seung-gyu Kim", "player": "Neymar", "scored": false, "player_goals": 4, "player_shots": 6, "shot": 1, "label": "Neymar (4/6)"}, {"season": "23/24", "competition": "World Cup qualification South America", "club": "Brazil", "date": "2023-09-09", "result": "Missed", "opponent": "Bolivia", "goalkeeper": "Guillermo Viscarra", "player": "Neymar", "scored": false, "player_goals": 4, "player_shots": 6, "shot": 0, "label": "Neymar (4/6)"}, {"season": "25/26", "competition": "LaLiga", "club": "Real Madrid", "date": "2026-03-22", "result": "Scored", "opponent": "Atl\u00e9tico de Madrid", "goalkeeper": "Juan Musso", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 17, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "UEFA Champions League", "club": "Real Madrid", "date": "2026-03-17", "result": "Scored", "opponent": "Manchester City", "goalkeeper": "Gianluigi Donnarumma", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 16, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "LaLiga", "club": "Real Madrid", "date": "2026-02-14", "result": "Scored", "opponent": "Real Sociedad", "goalkeeper": "\u00c1lex Remiro", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 13, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "LaLiga", "club": "Real Madrid", "date": "2026-02-14", "result": "Scored", "opponent": "Real Sociedad", "goalkeeper": "\u00c1lex Remiro", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 14, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "LaLiga", "club": "Real Madrid", "date": "2025-10-04", "result": "Scored", "opponent": "Villarreal CF", "goalkeeper": "Arnau Tenas", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 11, "label": "Vinicius Junior (13/18)"}, {"season": "24/25", "competition": "FIFA Intercontinental Cup", "club": "Real Madrid", "date": "2024-12-18", "result": "Scored", "opponent": "CF Pachuca", "goalkeeper": "Carlos Moreno", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 8, "label": "Vinicius Junior (13/18)"}, {"season": "24/25", "competition": "UEFA Champions League", "club": "Real Madrid", "date": "2024-11-05", "result": "Scored", "opponent": "AC Milan", "goalkeeper": "Mike Maignan", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 6, "label": "Vinicius Junior (13/18)"}, {"season": "24/25", "competition": "LaLiga", "club": "Real Madrid", "date": "2024-09-14", "result": "Scored", "opponent": "Real Sociedad", "goalkeeper": "\u00c1lex Remiro", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 5, "label": "Vinicius Junior (13/18)"}, {"season": "24/25", "competition": "LaLiga", "club": "Real Madrid", "date": "2024-08-29", "result": "Scored", "opponent": "UD Las Palmas", "goalkeeper": "Jasper Cillessen", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 4, "label": "Vinicius Junior (13/18)"}, {"season": "23/24", "competition": "UEFA Champions League", "club": "Real Madrid", "date": "2024-04-30", "result": "Scored", "opponent": "Bayern Munich", "goalkeeper": "Manuel Neuer", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 3, "label": "Vinicius Junior (13/18)"}, {"season": "23/24", "competition": "LaLiga", "club": "Real Madrid", "date": "2024-04-21", "result": "Scored", "opponent": "FC Barcelona", "goalkeeper": "Marc-Andr\u00e9 ter Stegen", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 2, "label": "Vinicius Junior (13/18)"}, {"season": "23/24", "competition": "Supercopa", "club": "Real Madrid", "date": "2024-01-14", "result": "Scored", "opponent": "FC Barcelona", "goalkeeper": "I\u00f1aki Pe\u00f1a", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 1, "label": "Vinicius Junior (13/18)"}, {"season": "22/23", "competition": "International Friendlies", "club": "Brazil", "date": "2023-06-17", "result": "Scored", "opponent": "Guinea", "goalkeeper": "Ibrahim Kon\u00e9", "player": "Vinicius Junior", "scored": true, "player_goals": 13, "player_shots": 18, "shot": 0, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "UEFA Champions League", "club": "Real Madrid", "date": "2026-03-11", "result": "Missed", "opponent": "Manchester City", "goalkeeper": "Gianluigi Donnarumma", "player": "Vinicius Junior", "scored": false, "player_goals": 13, "player_shots": 18, "shot": 15, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "LaLiga", "club": "Real Madrid", "date": "2025-11-01", "result": "Missed", "opponent": "Valencia CF", "goalkeeper": "Julen Agirrezabala", "player": "Vinicius Junior", "scored": false, "player_goals": 13, "player_shots": 18, "shot": 12, "label": "Vinicius Junior (13/18)"}, {"season": "24/25", "competition": "LaLiga", "club": "Real Madrid", "date": "2025-04-05", "result": "Missed", "opponent": "Valencia CF", "goalkeeper": "Giorgi Mamardashvili", "player": "Vinicius Junior", "scored": false, "player_goals": 13, "player_shots": 18, "shot": 10, "label": "Vinicius Junior (13/18)"}, {"season": "24/25", "competition": "UEFA Champions League", "club": "Real Madrid", "date": "2025-03-12", "result": "Missed", "opponent": "Atl\u00e9tico de Madrid", "goalkeeper": "Jan Oblak", "player": "Vinicius Junior", "scored": false, "player_goals": 13, "player_shots": 18, "shot": 9, "label": "Vinicius Junior (13/18)"}, {"season": "23/24", "competition": "World Cup qualification South America", "club": "Brazil", "date": "2024-11-14", "result": "Missed", "opponent": "Venezuela", "goalkeeper": "Rafael Romo", "player": "Vinicius Junior", "scored": false, "player_goals": 13, "player_shots": 18, "shot": 7, "label": "Vinicius Junior (13/18)"}, {"season": "25/26", "competition": "LaLiga", "club": "FC Barcelona", "date": "2026-03-15", "result": "Scored", "opponent": "Sevilla FC", "goalkeeper": "Odysseas Vlachodimos", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 9, "label": "Raphinha (11/11)"}, {"season": "25/26", "competition": "LaLiga", "club": "FC Barcelona", "date": "2026-03-15", "result": "Scored", "opponent": "Sevilla FC", "goalkeeper": "Odysseas Vlachodimos", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 10, "label": "Raphinha (11/11)"}, {"season": "25/26", "competition": "Copa del Rey", "club": "FC Barcelona", "date": "2026-03-03", "result": "Scored", "opponent": "Atl\u00e9tico de Madrid", "goalkeeper": "Juan Musso", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 8, "label": "Raphinha (11/11)"}, {"season": "25/26", "competition": "UEFA Champions League", "club": "FC Barcelona", "date": "2026-01-28", "result": "Scored", "opponent": "FC Copenhagen", "goalkeeper": "Dominik Kotarski", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 7, "label": "Raphinha (11/11)"}, {"season": "25/26", "competition": "LaLiga", "club": "FC Barcelona", "date": "2025-12-21", "result": "Scored", "opponent": "Villarreal CF", "goalkeeper": "Luiz J\u00fanior", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 6, "label": "Raphinha (11/11)"}, {"season": "24/25", "competition": "LaLiga", "club": "FC Barcelona", "date": "2025-04-19", "result": "Scored", "opponent": "Celta de Vigo", "goalkeeper": "Vicente Guaita", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 5, "label": "Raphinha (11/11)"}, {"season": "23/24", "competition": "World Cup qualification South America", "club": "Brazil", "date": "2025-03-21", "result": "Scored", "opponent": "Colombia", "goalkeeper": "Camilo Vargas", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 4, "label": "Raphinha (11/11)"}, {"season": "24/25", "competition": "LaLiga", "club": "FC Barcelona", "date": "2024-12-03", "result": "Scored", "opponent": "RCD Mallorca", "goalkeeper": "Leo Rom\u00e1n", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 3, "label": "Raphinha (11/11)"}, {"season": "23/24", "competition": "World Cup qualification South America", "club": "Brazil", "date": "2024-10-16", "result": "Scored", "opponent": "Peru", "goalkeeper": "Pedro Gallese", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 1, "label": "Raphinha (11/11)"}, {"season": "23/24", "competition": "World Cup qualification South America", "club": "Brazil", "date": "2024-10-16", "result": "Scored", "opponent": "Peru", "goalkeeper": "Pedro Gallese", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 2, "label": "Raphinha (11/11)"}, {"season": "23/24", "competition": "LaLiga", "club": "FC Barcelona", "date": "2024-05-13", "result": "Scored", "opponent": "Real Sociedad", "goalkeeper": "\u00c1lex Remiro", "player": "Raphinha", "scored": true, "player_goals": 11, "player_shots": 11, "shot": 0, "label": "Raphinha (11/11)"}, {"season": "24/25", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Clube de Regatas Vasco da Gama", "date": "2025-10-05", "result": "Scored", "opponent": "Esporte Clube Vit\u00f3ria", "goalkeeper": "Lucas Arcanjo", "player": "Rayan", "scored": true, "player_goals": 4, "player_shots": 4, "shot": 3, "label": "Rayan (4/4)"}, {"season": "24/25", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Clube de Regatas Vasco da Gama", "date": "2025-08-17", "result": "Scored", "opponent": "Santos FC", "goalkeeper": "Gabriel Braz\u00e3o", "player": "Rayan", "scored": true, "player_goals": 4, "player_shots": 4, "shot": 2, "label": "Rayan (4/4)"}, {"season": "22/23", "competition": "U17 World Cup", "club": "Brazil U17", "date": "2023-11-14", "result": "Scored", "opponent": "New Caledonia U16/U17", "goalkeeper": "Nicolas Kutran", "player": "Rayan", "scored": true, "player_goals": 4, "player_shots": 4, "shot": 1, "label": "Rayan (4/4)"}, {"season": "22/23", "competition": "U-17 South American Championship", "club": "Brazil U17", "date": "2023-04-20", "result": "Scored", "opponent": "Chile U17", "goalkeeper": "Francisco Vald\u00e9s", "player": "Rayan", "scored": true, "player_goals": 4, "player_shots": 4, "shot": 0, "label": "Rayan (4/4)"}, {"season": "23/24", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Botafogo de Futebol e Regatas", "date": "2024-08-04", "result": "Scored", "opponent": "Atl\u00e9tico Clube Goianiense", "goalkeeper": "Pedro Rangel", "player": "Luiz Henrique", "scored": true, "player_goals": 1, "player_shots": 2, "shot": 0, "label": "Luiz Henrique (1/2)"}, {"season": "25/26", "competition": "Premier Liga", "club": "Zenit St. Petersburg", "date": "2026-05-10", "result": "Missed", "opponent": "FC Sochi", "goalkeeper": "Aleksandr Degtev", "player": "Luiz Henrique", "scored": false, "player_goals": 1, "player_shots": 2, "shot": 1, "label": "Luiz Henrique (1/2)"}, {"season": "23/24", "competition": "Premier League", "club": "Wolverhampton Wanderers", "date": "2024-02-04", "result": "Scored", "opponent": "Chelsea FC", "goalkeeper": "Djordje Petrovic", "player": "Matheus Cunha", "scored": true, "player_goals": 2, "player_shots": 2, "shot": 1, "label": "Matheus Cunha (2/2)"}, {"season": "23/24", "competition": "FA Cup", "club": "Wolverhampton Wanderers", "date": "2024-01-16", "result": "Scored", "opponent": "Brentford FC", "goalkeeper": "Thomas Strakosha", "player": "Matheus Cunha", "scored": true, "player_goals": 2, "player_shots": 2, "shot": 0, "label": "Matheus Cunha (2/2)"}, {"season": "25/26", "competition": "International Friendlies", "club": "Brazil", "date": "2026-05-31", "result": "Scored", "opponent": "Panama", "goalkeeper": "Orlando Mosquera", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 24, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2026-05-02", "result": "Scored", "opponent": "West Ham United", "goalkeeper": "Mads Hermansen", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 23, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2026-04-11", "result": "Scored", "opponent": "Everton FC", "goalkeeper": "Jordan Pickford", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 22, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "International Friendlies", "club": "Brazil", "date": "2026-04-01", "result": "Scored", "opponent": "Croatia", "goalkeeper": "Dominik Livakovic", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 21, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "FA Cup", "club": "Brentford FC", "date": "2026-03-09", "result": "Scored", "opponent": "West Ham United", "goalkeeper": "Alphonse Areola", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 20, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2026-02-07", "result": "Scored", "opponent": "Newcastle United", "goalkeeper": "Nick Pope", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 19, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-11-29", "result": "Scored", "opponent": "Burnley FC", "goalkeeper": "Martin D\u00fabravka", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 18, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-11-22", "result": "Scored", "opponent": "Brighton & Hove Albion", "goalkeeper": "Bart Verbruggen", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 15, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-11-09", "result": "Scored", "opponent": "Newcastle United", "goalkeeper": "Aaron Ramsdale", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 14, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-10-25", "result": "Scored", "opponent": "Liverpool FC", "goalkeeper": "Giorgi Mamardashvili", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 13, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-08-17", "result": "Scored", "opponent": "Nottingham Forest", "goalkeeper": "Matz Sels", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 12, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2024-01-20", "result": "Scored", "opponent": "KVC Westerlo", "goalkeeper": "Sinan Bolat", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 9, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-12-26", "result": "Scored", "opponent": "Union Saint-Gilloise", "goalkeeper": "Anthony Moris", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 8, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-12-22", "result": "Scored", "opponent": "RWD Molenbeek", "goalkeeper": "Th\u00e9o Defourny", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 5, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-12-17", "result": "Scored", "opponent": "KAA Gent", "goalkeeper": "Davy Roef", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 3, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-11-22", "result": "Missed", "opponent": "Brighton & Hove Albion", "goalkeeper": "Bart Verbruggen", "player": "Igor Thiago", "scored": false, "player_goals": 19, "player_shots": 25, "shot": 16, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "UEFA Conference League", "club": "Club Brugge KV", "date": "2024-04-11", "result": "Missed", "opponent": "PAOK Thessaloniki", "goalkeeper": "Dominik Kotarski", "player": "Igor Thiago", "scored": false, "player_goals": 19, "player_shots": 25, "shot": 10, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-12-22", "result": "Missed", "opponent": "RWD Molenbeek", "goalkeeper": "Th\u00e9o Defourny", "player": "Igor Thiago", "scored": false, "player_goals": 19, "player_shots": 25, "shot": 6, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-12-17", "result": "Scored", "opponent": "KAA Gent", "goalkeeper": "Davy Roef", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 4, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "UEFA Conference League", "club": "Club Brugge KV", "date": "2023-11-09", "result": "Scored", "opponent": "FC Lugano", "goalkeeper": "Amir Saipi", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 2, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "UEFA Conference League Qualifying", "club": "Club Brugge KV", "date": "2023-08-10", "result": "Scored", "opponent": "KA Akureyri", "goalkeeper": "Kristijan Jajalo", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 1, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-07-30", "result": "Scored", "opponent": "KV Mechelen", "goalkeeper": "Ga\u00ebtan Coucke", "player": "Igor Thiago", "scored": true, "player_goals": 19, "player_shots": 25, "shot": 0, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Premier League", "club": "Brentford FC", "date": "2025-11-22", "result": "Missed", "opponent": "Brighton & Hove Albion", "goalkeeper": "Bart Verbruggen", "player": "Igor Thiago", "scored": false, "player_goals": 19, "player_shots": 25, "shot": 17, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "UEFA Conference League", "club": "Club Brugge KV", "date": "2024-04-11", "result": "Missed", "opponent": "PAOK Thessaloniki", "goalkeeper": "Dominik Kotarski", "player": "Igor Thiago", "scored": false, "player_goals": 19, "player_shots": 25, "shot": 11, "label": "Igor Thiago (19/25)"}, {"season": "23/24", "competition": "Jupiler Pro League", "club": "Club Brugge KV", "date": "2023-12-22", "result": "Missed", "opponent": "RWD Molenbeek", "goalkeeper": "Th\u00e9o Defourny", "player": "Igor Thiago", "scored": false, "player_goals": 19, "player_shots": 25, "shot": 7, "label": "Igor Thiago (19/25)"}, {"season": "25/26", "competition": "Ligue 1", "club": "Olympique Lyon", "date": "2026-01-25", "result": "Scored", "opponent": "FC Metz", "goalkeeper": "Jonathan Fischer", "player": "Endrick", "scored": true, "player_goals": 1, "player_shots": 3, "shot": 2, "label": "Endrick (1/3)"}, {"season": "23/24", "competition": "CONMEBOL Pre-Olympic Tournament", "club": "Brazil U23", "date": "2024-02-05", "result": "Missed", "opponent": "Paraguay U23", "goalkeeper": "\u00c1ngel Gonz\u00e1lez", "player": "Endrick", "scored": false, "player_goals": 1, "player_shots": 3, "shot": 1, "label": "Endrick (1/3)"}, {"season": "22/23", "competition": "Campeonato Brasileiro S\u00e9rie A", "club": "Sociedade Esportiva Palmeiras", "date": "2023-07-02", "result": "Missed", "opponent": "Club Athletico Paranaense", "goalkeeper": "L\u00e9o Linck", "player": "Endrick", "scored": false, "player_goals": 1, "player_shots": 3, "shot": 0, "label": "Endrick (1/3)"}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p><em>Data from <a href="https://www.transfermarkt.com">Transfermarkt</a>.</em></p>
+<p>How can we quantify the uncertainty around the conversion rate and pick the best shooter for a single penalty? There are many factors, such as the league and goalie of each shot. For simplicity, let’s stick to the player-level shot data. That still leaves us with the uncertainty around the player’s own rate. Intuitively, one might hesitate to pick players such as Éderson, who only shot a single penalty. One might also be wary of picking a player like Fabinho, with a low conversion rate.</p>
+<p>A natural way to encode both intuitions is to use a <a href="https://www.pymc.io/projects/examples/en/latest/case_studies/hierarchical_partial_pooling.html">hierarchical partial pooling</a>. The idea is to model a population of penalty takers, and use that estimate to regularize each player’s individual rate. Players with few shots get pulled toward the population mean, while players with many shots are allowed to deviate from it.</p>
+<p>Concretely, we assume each player <span class="math inline"><em>i</em></span> has a conversion rate <span class="math inline"><em>θ</em><sub><em>i</em></sub></span>, drawn from a <span class="math inline">Beta(<em>ϕ</em><em>κ</em>, (1 − <em>ϕ</em>)<em>κ</em>)</span> distribution, where <span class="math inline"><em>ϕ</em> ∈ [0, 1]</span> is the mean conversion rate for a top-level player and <span class="math inline"><em>κ</em> &gt; 0</span> controls how tightly players cluster around it. We place a <span class="math inline">Beta(8, 2)</span> prior on <span class="math inline"><em>ϕ</em></span>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11627389/">so that the mean conversion rate of the population is centered on 80%</a>. We place a non-informative <span class="math inline">Pareto(1.5)</span> prior on <span class="math inline"><em>κ</em></span>. Finally, each player’s goal count comes from a <span class="math inline">Binomial(<em>n</em><sub><em>i</em></sub>, <em>θ</em><sub><em>i</em></sub>)</span>.</p>
+<div id="cell-4" class="cell" data-execution_count="25">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpyro</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpyro.distributions <span class="im">as</span> dist</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpyro.infer <span class="im">import</span> MCMC, NUTS</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>numpyro.set_platform(<span class="st">"cpu"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>numpyro.set_host_device_count(<span class="dv">4</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> df.unique([<span class="st">"label"</span>, <span class="st">"player"</span>, <span class="st">"player_goals"</span>, <span class="st">"player_shots"</span>]).sort(<span class="st">"player"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> summary[<span class="st">"label"</span>].to_list()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>players <span class="op">=</span> summary[<span class="st">"player"</span>].to_list()</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>shots <span class="op">=</span> jnp.array(summary[<span class="st">"player_shots"</span>].to_numpy())</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>goals <span class="op">=</span> jnp.array(summary[<span class="st">"player_goals"</span>].to_numpy())</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">len</span>(players)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model():</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    phi <span class="op">=</span> numpyro.sample(<span class="st">"phi"</span>, dist.Beta(<span class="dv">8</span>, <span class="dv">2</span>))</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    kappa_log <span class="op">=</span> numpyro.sample(<span class="st">"kappa_log"</span>, dist.Exponential(<span class="fl">1.5</span>))</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    kappa <span class="op">=</span> numpyro.deterministic(<span class="st">"kappa"</span>, jnp.exp(kappa_log))</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> numpyro.plate(<span class="st">"players"</span>, N):</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        theta <span class="op">=</span> numpyro.sample(<span class="st">"theta"</span>, dist.Beta(phi <span class="op">*</span> kappa, (<span class="fl">1.0</span> <span class="op">-</span> phi) <span class="op">*</span> kappa))</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    numpyro.sample(<span class="st">"y"</span>, dist.Binomial(total_count<span class="op">=</span>shots, probs<span class="op">=</span>theta), obs<span class="op">=</span>goals)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>kernel <span class="op">=</span> NUTS(model, target_accept_prob<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>mcmc <span class="op">=</span> MCMC(</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    kernel,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    num_warmup<span class="op">=</span><span class="dv">2000</span>,</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    num_samples<span class="op">=</span><span class="dv">4000</span>,</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    num_chains<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    progress_bar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>seed <span class="op">=</span> jax.random.PRNGKey(<span class="dv">0</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>mcmc.run(seed)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>idata <span class="op">=</span> az.from_numpyro(</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    mcmc,</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    coords<span class="op">=</span>{<span class="st">"players"</span>: players},</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    dims<span class="op">=</span>{<span class="st">"theta"</span>: [<span class="st">"players"</span>]},</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">float</span>(az.rhat(idata).to_dataset().to_array().<span class="bu">max</span>()) <span class="op">&lt;</span> <span class="fl">1.001</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>After fitting the model, let’s analyze the posterior of each player:</p>
+<div id="cell-6" class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>theta_samples <span class="op">=</span> idata.posterior[<span class="st">"theta"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, N)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>theta_hdi <span class="op">=</span> az.hdi(idata, var_names<span class="op">=</span>[<span class="st">"theta"</span>], prob<span class="op">=</span><span class="fl">0.9</span>)[<span class="st">"theta"</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>hdi_lo <span class="op">=</span> theta_hdi.sel(ci_bound<span class="op">=</span><span class="st">"lower"</span>).values</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>hdi_hi <span class="op">=</span> theta_hdi.sel(ci_bound<span class="op">=</span><span class="st">"upper"</span>).values</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>means <span class="op">=</span> theta_samples.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>inference <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span>: labels,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"player"</span>: players,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"shots"</span>: shots.tolist(),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"goals"</span>: goals.tolist(),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mean"</span>: means.tolist(),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hdi_lo"</span>: hdi_lo.tolist(),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hdi_hi"</span>: hdi_hi.tolist(),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> alt.Chart(inference)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>order <span class="op">=</span> inference.sort(<span class="st">"mean"</span>, descending<span class="op">=</span><span class="va">True</span>)[<span class="st">"label"</span>].to_list()</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> base.mark_rule(strokeWidth<span class="op">=</span><span class="dv">2</span>).encode(</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>alt.X(</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hdi_lo:Q"</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        title<span class="op">=</span><span class="st">"Conversion rate"</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        axis<span class="op">=</span>alt.Axis(<span class="bu">format</span><span class="op">=</span><span class="st">".0%"</span>),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        scale<span class="op">=</span>alt.Scale(zero<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    x2<span class="op">=</span><span class="st">"hdi_hi:Q"</span>,</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span>alt.Y(<span class="st">"label:N"</span>, sort<span class="op">=</span>order, title<span class="op">=</span><span class="va">None</span>),</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>alt.value(<span class="st">"steelblue"</span>),</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>points <span class="op">=</span> base.mark_point(filled<span class="op">=</span><span class="va">True</span>, size<span class="op">=</span><span class="dv">120</span>).encode(</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>alt.X(<span class="st">"mean:Q"</span>),</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span>alt.Y(<span class="st">"label:N"</span>, sort<span class="op">=</span>order, title<span class="op">=</span><span class="va">None</span>),</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>alt.value(<span class="st">"steelblue"</span>),</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span>[</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        alt.Tooltip(<span class="st">"player:N"</span>, title<span class="op">=</span><span class="st">"Player"</span>),</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        alt.Tooltip(<span class="st">"mean:Q"</span>, title<span class="op">=</span><span class="st">"Posterior mean"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">".1%"</span>),</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        alt.Tooltip(<span class="st">"hdi_lo:Q"</span>, title<span class="op">=</span><span class="st">"90% HDI low"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">".1%"</span>),</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        alt.Tooltip(<span class="st">"hdi_hi:Q"</span>, title<span class="op">=</span><span class="st">"90% HDI high"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">".1%"</span>),</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>(bars <span class="op">+</span> points).properties(</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span>alt.TitleParams(</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>        text<span class="op">=</span><span class="st">"Penalty conversion posteriors"</span>,</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>        subtitle<span class="op">=</span>[<span class="st">"Dot is the posterior mean, bar is the 90% HDI."</span>],</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="st">"container"</span>,</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">600</span>,</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="26">
+
+<style>
+  #altair-viz-822d14c8033c46f3989f6649c74b7c8c.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-822d14c8033c46f3989f6649c74b7c8c.vega-embed details,
+  #altair-viz-822d14c8033c46f3989f6649c74b7c8c.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-822d14c8033c46f3989f6649c74b7c8c"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-822d14c8033c46f3989f6649c74b7c8c") {
+      outputDiv = document.getElementById("altair-viz-822d14c8033c46f3989f6649c74b7c8c");
+    }
+
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@6?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@6.4.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@7?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      let deps = ["vega-embed"];
+      require(deps, displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "6")
+        .then(() => maybeLoadScript("vega-lite", "6.4.1"))
+        .then(() => maybeLoadScript("vega-embed", "7"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"mark": {"type": "rule", "strokeWidth": 2}, "encoding": {"color": {"value": "steelblue"}, "x": {"axis": {"format": ".0%"}, "field": "hdi_lo", "scale": {"zero": false}, "title": "Conversion rate", "type": "quantitative"}, "x2": {"field": "hdi_hi"}, "y": {"field": "label", "sort": ["Raphinha (11/11)", "Rayan (4/4)", "Matheus Cunha (2/2)", "Bruno Guimar\u00e3es (2/2)", "Lucas Paquet\u00e1 (11/13)", "\u00c9derson (1/1)", "Igor Thiago (19/25)", "Vinicius Junior (13/18)", "Neymar (4/6)", "Luiz Henrique (1/2)", "Endrick (1/3)", "Fabinho (3/7)"], "title": null, "type": "nominal"}}}, {"mark": {"type": "point", "filled": true, "size": 120}, "encoding": {"color": {"value": "steelblue"}, "tooltip": [{"field": "player", "title": "Player", "type": "nominal"}, {"field": "mean", "format": ".1%", "title": "Posterior mean", "type": "quantitative"}, {"field": "hdi_lo", "format": ".1%", "title": "HDI 90% low", "type": "quantitative"}, {"field": "hdi_hi", "format": ".1%", "title": "HDI 90% high", "type": "quantitative"}], "x": {"field": "mean", "type": "quantitative"}, "y": {"field": "label", "sort": ["Raphinha (11/11)", "Rayan (4/4)", "Matheus Cunha (2/2)", "Bruno Guimar\u00e3es (2/2)", "Lucas Paquet\u00e1 (11/13)", "\u00c9derson (1/1)", "Igor Thiago (19/25)", "Vinicius Junior (13/18)", "Neymar (4/6)", "Luiz Henrique (1/2)", "Endrick (1/3)", "Fabinho (3/7)"], "title": null, "type": "nominal"}}}], "data": {"name": "data-a631aaf0aab6bfec5e5e24d12a0e89d3"}, "height": 600, "title": {"text": "Penalty conversion posteriors", "subtitle": ["Dot is the posterior mean, bar is the 90% HDI."]}, "width": "container", "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-a631aaf0aab6bfec5e5e24d12a0e89d3": [{"label": "Bruno Guimar\u00e3es (2/2)", "player": "Bruno Guimar\u00e3es", "shots": 2, "goals": 2, "mean": 0.843144953250885, "hdi_lo": 0.6402363181114197, "hdi_hi": 0.9999998807907104}, {"label": "Endrick (1/3)", "player": "Endrick", "shots": 3, "goals": 1, "mean": 0.5694463849067688, "hdi_lo": 0.2558582127094269, "hdi_hi": 0.8830662965774536}, {"label": "Fabinho (3/7)", "player": "Fabinho", "shots": 7, "goals": 3, "mean": 0.551540195941925, "hdi_lo": 0.304957777261734, "hdi_hi": 0.812235951423645}, {"label": "Igor Thiago (19/25)", "player": "Igor Thiago", "shots": 25, "goals": 19, "mean": 0.7597278356552124, "hdi_lo": 0.6379109621047974, "hdi_hi": 0.8920680284500122}, {"label": "Lucas Paquet\u00e1 (11/13)", "player": "Lucas Paquet\u00e1", "shots": 13, "goals": 11, "mean": 0.8233111500740051, "hdi_lo": 0.6897681355476379, "hdi_hi": 0.9688859581947327}, {"label": "Luiz Henrique (1/2)", "player": "Luiz Henrique", "shots": 2, "goals": 1, "mean": 0.6663339734077454, "hdi_lo": 0.379177451133728, "hdi_hi": 0.9714605212211609}, {"label": "Matheus Cunha (2/2)", "player": "Matheus Cunha", "shots": 2, "goals": 2, "mean": 0.8463068008422852, "hdi_lo": 0.647766649723053, "hdi_hi": 0.9999998807907104}, {"label": "Neymar (4/6)", "player": "Neymar", "shots": 6, "goals": 4, "mean": 0.7061316967010498, "hdi_lo": 0.4869081676006317, "hdi_hi": 0.9360454082489014}, {"label": "Raphinha (11/11)", "player": "Raphinha", "shots": 11, "goals": 11, "mean": 0.9315662384033203, "hdi_lo": 0.8282715678215027, "hdi_hi": 0.9999998807907104}, {"label": "Rayan (4/4)", "player": "Rayan", "shots": 4, "goals": 4, "mean": 0.8829872608184814, "hdi_lo": 0.7277138829231262, "hdi_hi": 0.9999998807907104}, {"label": "Vinicius Junior (13/18)", "player": "Vinicius Junior", "shots": 18, "goals": 13, "mean": 0.7299203872680664, "hdi_lo": 0.574288010597229, "hdi_hi": 0.8720084428787231}, {"label": "\u00c9derson (1/1)", "player": "\u00c9derson", "shots": 1, "goals": 1, "mean": 0.8116899132728577, "hdi_lo": 0.570275068283081, "hdi_hi": 0.9999998807907104}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>Ranking by posterior mean, Raphinha ends up at the top, with a tight interval. Rayan follows in second place, but his wider interval reflects the weaker evidence. Players with few shots get pulled toward the population mean, shrinking extreme rates like Éderson’s.</p>
+<p>Guimarães ends up in third place, tied with Cunha and above Vini and Neymar, despite the large uncertainty around his estimate. We could be more conservative and rank by the lower bound of the posterior, in which case Paquetá would rank third, above Guimarães and Cunha.</p>
+<p>Rayan ranks better than Guimarães in both mean and lower bound, so he would have probably been a better pick. Raphinha would have ranked even higher, but he didn’t play in the match against Norway.</p>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/assuncaolfi\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

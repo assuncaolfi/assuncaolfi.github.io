@@ -1,12 +1,15 @@
 [project]
 name = "website"
 version = "0.1.0"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "altair>=6.2.2",
+    "arviz>=1.2.0",
     "jupyter>=1.1.1",
     "numpy>=2.5.0",
+    "numpyro>=0.21.0",
     "pillow>=12.3.0",
     "polars>=1.42.1",
     "requests>=2.34.2",
+    "scipy>=1.18.0",
 ]
