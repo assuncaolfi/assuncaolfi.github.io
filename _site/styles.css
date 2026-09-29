@@ -21,6 +21,11 @@
    color: inherit;
  }
 
+ .post-nav {
+   display: flex;
+   justify-content: space-between;
+ }
+
  .listing-no-matching {
    display: none;
  }

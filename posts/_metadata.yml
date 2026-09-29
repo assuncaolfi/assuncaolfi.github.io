@@ -3,8 +3,11 @@
 # freeze computational output
 # (see https://quarto.org/docs/projects/code-execution.html#freeze)
 freeze: true
+echo: false
 include-before-body: _back.html
 date-format: long
+format: html
+page-layout: full
 
 # Enable banner style title blocks
 title-block-banner: true

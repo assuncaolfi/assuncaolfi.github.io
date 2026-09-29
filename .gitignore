@@ -8,6 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+.env
 
 /.quarto/
 **/*.quarto_ipynb

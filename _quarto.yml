@@ -8,6 +8,7 @@ website:
   description: "A blog built with Quarto"
   site-url: https://assuncaolfi.github.io
   title: "blog"
+  repo-url: https://github.com/assuncaolfi/assuncaolfi.github.io
   navbar:
     right:
       - icon: github
