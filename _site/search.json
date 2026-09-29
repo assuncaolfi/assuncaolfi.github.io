@@ -1,9 +1,0 @@
-[
-  {
-    "objectID": "posts/is-jev-calibrated/index.html",
-    "href": "posts/is-jev-calibrated/index.html",
-    "title": "Jev is underpowered",
-    "section": "",
-    "text": "← Home\n\n\n\n\n\nTypeSafe AI claims their new LLM, Jev, outputs calibrated probabilities. Calibrated against what? I’m not the first to ask, but I want to answer a more specific question.\nDoes Jev “know” that some of its training data is underpowered or just plain bad research? For example, does Jev “believe” in a paper claiming that good-looking parents are 36% more likely to have girl babies as their first child, in spite of a small sample size and a large prior literature suggesting changes caused by more reasonable factors are in the order of 1 percentage point?\nLet’s give Jev the context of the interview from the original paper and ask it:\nAn interviewer rates the beauty of a random parent in a scale ranging from 1 to 5. The rating of that parent is X. Is the parent’s first child a girl?\nWe ask it a 1,000 times, each time sampling a new random rating uniformly between 1 and 5. Let’s plot the results, each dot is one of 1,000 answers:\n\n\n\n\n\n\n\n\n\nPoints are jiggled horizontally so we can get a better sense of the distribution. There’s no need to model this data to see that the probability assigned to ratings 1 and 3 barely overlap. Difference between averages is ~2.8% and difference the most between extreme predictions is 8%.\nA few things stick out to me. At this point, I think there are more articles critisizing the original study than articles in support of it. Maybe that’s why Jev predicts a sort of regularized difference? Also, what’s up with the non-monotonicity? Finally, why did Jev produce probabilities with 2 digits only? Particularly in this case, where true differences are likely to be below 1%?"
-  }
-]

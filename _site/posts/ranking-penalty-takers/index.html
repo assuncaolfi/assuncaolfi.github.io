@@ -47,7 +47,19 @@ ul.task-list li input[type="checkbox"] {
 
 <body>
 
-<a href="../../">← Home</a>
+<nav class="post-nav">
+  <a href="../../">← Home</a>
+  <a id="post-source-link" href="https://github.com/assuncaolfi/assuncaolfi.github.io">View source</a>
+</nav>
+
+<script>
+  const sourceLink = document.querySelector("#post-source-link");
+  const sourcePath = window.location.pathname.endsWith("/")
+    ? `${window.location.pathname}index.ipynb`
+    : window.location.pathname.replace(/\.html$/, ".ipynb");
+
+  sourceLink.href = `https://github.com/assuncaolfi/assuncaolfi.github.io/blob/main${sourcePath}`;
+</script>
 
 <header id="title-block-header">
 <h1 class="title">Ranking penalty takers</h1>

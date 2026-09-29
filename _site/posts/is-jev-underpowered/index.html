@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2026-09-28">
 
-<title>Jev is underpowered – blog</title>
+<title>Is jev underpowered? – blog</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -59,19 +59,19 @@ ul.task-list li input[type="checkbox"] {
 </script>
 
 <header id="title-block-header">
-<h1 class="title">Jev is underpowered</h1>
+<h1 class="title">Is jev underpowered?</h1>
 
 <p class="date">September 28, 2026</p>
 </header>
 
 
-<p><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">TypeSafe AI claims their new LLM, Jev, outputs calibrated probabilities</a>. Calibrated against what? <a href="https://www.alexmolas.com/2026/09/23/jev-cant-be-calibrated.html">I’m not the first to ask</a>, but I want to answer a more specific question.</p>
-<p>Does Jev “know” that some of its training data is underpowered or just plain bad research? For example, does Jev “believe” in <a href="https://sites.stat.columbia.edu/gelman/research/unpublished/power.pdf">a paper claiming that good-looking parents are 36% more likely to have girl babies as their first child, in spite of a small sample size and a large prior literature suggesting changes caused by more reasonable factors are in the order of 1 percentage point</a>?</p>
-<p>Let’s give Jev the context of the interview from the original paper and ask it:</p>
-<p><em>An interviewer rates the beauty of a random parent in a scale ranging from 1 to 5. The rating of that parent is X. Is the parent’s first child a girl?</em></p>
-<p>We ask it a 1,000 times, each time sampling a new random rating uniformly between 1 and 5. Let’s plot the results, each dot is one of 1,000 answers:</p>
-<div id="cell-4" class="cell" data-execution_count="142">
-<div class="cell-output cell-output-display" data-execution_count="142">
+<p><a href="https://docs.typesafe.ai/concepts/system-one">TypeSafe calls Jev the first model in its System One model class</a>, named after Daniel Kahneman’s distinction between fast, automatic judgment (System 1) and slower, deliberate reasoning (System 2). Also, <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">TypeSafe claims that System One models output calibrated probabilities</a>. Calibrated against what? <a href="https://www.alexmolas.com/2026/09/23/jev-cant-be-calibrated.html">I’m not the first to ask</a>, but I want to answer a more specific question. Kahneman himself later <a href="https://retractionwatch.com/2017/02/20/placed-much-faith-underpowered-studies-nobel-prize-winner-admits-mistakes/">admitted that he had placed too much faith in underpowered studies</a>. Can Jev give plausible probabilities for a question where published research has produced exaggerated estimates?</p>
+<p>For example, does Jev “believe” the widely reported claim that good-looking parents are 36% more likely to have a daughter than a son as their first child? <a href="https://sites.stat.columbia.edu/gelman/research/unpublished/power.pdf">Gelman and Weakliem</a> trace how this claim grew in analysis and reporting. A regression analysis estimated a statistically non-significant difference of 4.7 percentage points. A selected comparison put the difference at 8 percentage points; a logistic regression estimated 26% lower odds of having a son; and media reports ultimately turned this into the claim that attractive parents were 36% more likely to have a daughter than a son. The study had about 3,000 respondents, but even that sample was too small to reliably detect the effects of less than 1 percentage point considered plausible from prior research.</p>
+<p>Let’s ask Jev a question using the same beauty-rating scale. We do not provide the original study or identify a particular population.</p>
+<p><em>An interviewer rates the beauty of a random parent on a scale from 1 to 5. The rating of that parent is X. Is the parent’s first child a girl?</em></p>
+<p>We sample 1,000 ratings uniformly between 1 and 5 and make a separate call to <code>jev-1.13.0</code> for each sampled rating. Following <a href="https://docs.typesafe.ai/cookbooks/consistency_noul_cookbook">TypeSafe’s self-consistency cookbook</a>, every call contains one question and a fresh, throwaway <code>uid</code> in its state. Because the <code>uid</code> changes on every call, the inputs are not literally identical. If the answers vary, we cannot tell whether this reflects Jev’s inherent predictive variability or sensitivity to the otherwise irrelevant <code>uid</code>. Each dot below is the answer from one separate API call:</p>
+<div id="cell-4" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-09-29T11:54:11.597990Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-09-29T11:54:11.597903Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-09-29T11:54:12.393565Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-09-29T11:54:12.393154Z&quot;}}" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 <figure>
 <p><img src="index_files/figure-html/cell-4-output-1.png" width="640" height="480"></p>
@@ -79,8 +79,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p>Points are jiggled horizontally so we can get a better sense of the distribution. There’s no need to model this data to see that the probability assigned to ratings 1 and 3 barely overlap. Difference between averages is ~2.8% and difference the most between extreme predictions is 8%.</p>
-<p>A few things stick out to me. At this point, I think there are more articles critisizing the original study than articles in support of it. Maybe that’s why Jev predicts a sort of regularized difference? Also, what’s up with the non-monotonicity? Finally, why did Jev produce probabilities with 2 digits only? Particularly in this case, where true differences are likely to be below 1%?</p>
+<p>Points are jittered horizontally so we can get a better sense of the distribution. The average probabilities for ratings 1 through 5 are 43.9%, 45.0%, 46.3%, 44.6%, and 42.4%. All are below the usual baseline of about 49%. The largest difference between group averages is 3.9 percentage points, between ratings 3 and 5. The non-monotonic pattern is also odd: the average rises from 43.9% at rating 1 to 46.3% at rating 3, then falls to 42.4% at rating 5. Although the prompt leaves the population unspecified, these values are difficult to reconcile with that baseline and the small effects considered plausible in the literature.</p>
+<p>These results do not show that Jev adopted the exaggerated research finding: the highest beauty rating produces the lowest average probability of a girl. This experiment also does not measure calibration against observed outcomes. It does show probabilities that are difficult to reconcile with the usual birth-sex baseline and plausible effects of parental attractiveness. What evidence supports treating Jev’s probabilities as calibrated on questions like this?</p>
 
 
 <script id="quarto-html-after-body" type="application/javascript">
