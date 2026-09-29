@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://assuncaolfi.github.io/posts/ranking-penalty-takers/index.html</loc>
+    <lastmod>2026-09-29T13:05:49.109Z</lastmod>
+  </url>
+  <url>
+    <loc>https://assuncaolfi.github.io/posts/jev-is-underpowered/index.html</loc>
+    <lastmod>2026-09-29T13:05:49.108Z</lastmod>
+  </url>
+  <url>
     <loc>https://assuncaolfi.github.io/index.html</loc>
-    <lastmod>2026-07-09T21:11:17.483Z</lastmod>
+    <lastmod>2026-09-29T13:05:49.107Z</lastmod>
   </url>
   <url>
     <loc>https://assuncaolfi.github.io/posts/visual-index-common-brazilian-woods/index.html</loc>
-    <lastmod>2026-07-09T21:11:17.484Z</lastmod>
-  </url>
-  <url>
-    <loc>https://assuncaolfi.github.io/posts/ranking-penalty-takers/index.html</loc>
-    <lastmod>2026-07-09T21:11:17.483Z</lastmod>
+    <lastmod>2026-09-29T13:05:49.109Z</lastmod>
   </url>
 </urlset>
